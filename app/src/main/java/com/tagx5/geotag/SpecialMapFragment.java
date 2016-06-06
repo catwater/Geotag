@@ -9,10 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.backendless.Backendless;
 import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.BackendlessDataQuery;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -29,6 +32,7 @@ import com.google.android.gms.vision.barcode.Barcode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by coryatwater on 6/5/16.
@@ -50,18 +54,10 @@ public class SpecialMapFragment extends SupportMapFragment implements OnMapReady
 
     private GoogleApiClient mGoogleApiClient;
 
-    private BackendlessUser backendlessUser;
     private Double latBlaster = 30.0;
     private Double longDoink = 30.0;
     private static final String ARG_LATITUDE = "latitude";
     private static final String ARG_LONGITUDE = "longitude";
-    private Button shoot;
-
-
-
-
-    private ArrayList<String> playerUsername;//to do:pull information(username) from backendless so that we have a list of players in the game
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,19 +72,6 @@ public class SpecialMapFragment extends SupportMapFragment implements OnMapReady
         }
         point = new GeoPoint(0,0);
         setLocationRequest();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = super.onCreateView(inflater,container,savedInstanceState);
-        shoot = (Button) rootView.findViewById(R.id.press_for_poop);
-/*        shoot.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //// TODO: 5/26/16 onclick
-            }
-        }); */
-        return rootView;
     }
 
     protected void setLocationRequest(){
@@ -118,6 +101,35 @@ public class SpecialMapFragment extends SupportMapFragment implements OnMapReady
                         Log.e("TAG", "" + mLastLocation.getLongitude() );
                         longDoink = mLastLocation.getLongitude();
                         latBlaster = mLastLocation.getLatitude();
+
+
+
+                        Backendless.Persistence.save(Backendless.UserService.CurrentUser(), new AsyncCallback<BackendlessUser>() {
+                            public void handleResponse( BackendlessUser response )
+                            {
+                                response.setProperty(ARG_LATITUDE,longDoink);
+                                response.setProperty(ARG_LONGITUDE,latBlaster);
+                                Backendless.Persistence.save(response, new AsyncCallback<BackendlessUser>() {
+                                    @Override
+                                    public void handleResponse(BackendlessUser response) {
+
+                                        Log.e(TAG, "handleResponse: saved?");
+                                    }
+
+                                    @Override
+                                    public void handleFault(BackendlessFault fault) {
+
+                                    }
+                                });
+                                // new Contact instance has been saved
+                            }
+
+                            public void handleFault( BackendlessFault fault )
+                            {
+                                // an error has occurred, the error code can be retrieved with fault.getCode()
+                            }
+                        });
+
                         point.setX(longDoink);
                         point.setY(latBlaster);
 
@@ -223,10 +235,38 @@ public class SpecialMapFragment extends SupportMapFragment implements OnMapReady
                 super.handleResponse(response);
                 userSet = response.getData();
 
-                for(BackendlessUser bu : userSet){
-                    Log.e(TAG, "onCreateView: "+ bu.getProperty("username").toString() );
-                }
+                checkForHits(userSet);
 
+            }
+        };
+    }
+
+    private void checkForHits(List<BackendlessUser> userSet){
+        for(BackendlessUser bu: userSet){
+            double latitude = Double.valueOf(bu.getProperty(ARG_LATITUDE).toString());
+            double longitude = Double.valueOf(bu.getProperty(ARG_LONGITUDE).toString());
+            double myLatitude = Double.valueOf(Backendless.UserService.CurrentUser().getProperty(ARG_LATITUDE).toString());
+            double myLongitude = Double.valueOf(Backendless.UserService.CurrentUser().getProperty(ARG_LONGITUDE).toString());
+
+            if((Math.abs((latitude-myLatitude)) < .00006) && (Math.abs((longitude-myLongitude)) < .00006)){
+                Log.e(TAG, "checkForHits: hit " + bu.getProperty("firstName"));
+                Toast.makeText(getActivity(), "you hit " + bu.getProperty("firstName") + "!", Toast.LENGTH_SHORT).show();
+                GameFragment sendScore = new GameFragment ();
+                Bundle args = new Bundle();
+                args.putString("score", "true");
+                sendScore.setArguments(args);
+                getFragmentManager().beginTransaction().add(R.id.game_fragment_container, sendScore).commit();
+            }
+
+
+        }
+    }
+
+    private LoadingCallback<BackendlessUser> createUploadCallback(){
+        return new LoadingCallback<BackendlessUser>(getActivity(), "Registering...\npatience is a virtue") {
+            @Override
+            public void handleResponse(BackendlessUser user) {
+                super.handleResponse(user);
             }
         };
     }

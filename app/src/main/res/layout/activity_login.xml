@@ -9,8 +9,7 @@
         android:hint="username"
         android:ems="10"
         android:id="@+id/username_field"
-        android:layout_marginTop="170dp"
-        android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
     <EditText
@@ -42,5 +41,15 @@
         android:layout_below="@+id/submit_button"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="19dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Welcome to Geotag"
+        android:id="@+id/textView"
+        android:layout_marginTop="97dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

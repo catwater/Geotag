@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.backendless.Backendless;
 
@@ -17,6 +18,7 @@ import com.backendless.Backendless;
 public class HomeFragment extends Fragment{
 
     private Button joinGame;
+    private TextView v;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -27,6 +29,8 @@ public class HomeFragment extends Fragment{
 
         final View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         joinGame = (Button) rootView.findViewById(R.id.join_game_button);
+        v = (TextView) rootView.findViewById(R.id.intro_message);
+        v.setText("Hey there " + Backendless.UserService.CurrentUser().getProperty("username"));
         joinGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

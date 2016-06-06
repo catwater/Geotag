@@ -28,6 +28,13 @@ public class GameFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_game, container, false);
         mScore = (TextView) rootView.findViewById(R.id.text_score);
         mLivesRemaining = (TextView) rootView.findViewById(R.id.text_lives_remaining);
+        try{
+            if(getArguments().getString("score").equals("true")){
+                score += 1;
+            }
+        }catch (NullPointerException e){
+            //// TODO: 6/5/16  
+        }
 
         //display user's lives remaining & score
         BackendlessUser k = Backendless.UserService.CurrentUser();
