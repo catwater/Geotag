@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="username"
+        android:ems="10"
+        android:id="@+id/username_field"
+        android:layout_marginTop="170dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:hint="password"
+        android:id="@+id/password_field"
+        android:layout_below="@+id/username_field"
+        android:layout_alignStart="@+id/username_field" />
+
+    <Button
+        android:text="log in"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:id="@+id/submit_button"
+        android:layout_below="@+id/password_field"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:text="Not already a user? Make an account!"
+        android:textSize="18sp"
+        android:textColor="#a06dba"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/make_account"
+        android:layout_below="@+id/submit_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="19dp" />
+
+</RelativeLayout>
